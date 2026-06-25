@@ -1,4 +1,0 @@
-ultralytics
-easyocr
-numpy
-opencv-python
