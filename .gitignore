@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# ML weights (Keep best.zip in git, but ignore the unzipped model weights)
+*.pt
+*.onnx
+*.engine
+best.pt
+models/best.pt
+
+# Output directories & data
+cropped_plates/
+data/processed/
+license_plates.txt
+
+# Editor / System files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
