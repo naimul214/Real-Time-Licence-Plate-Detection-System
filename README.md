@@ -1,79 +1,97 @@
-# License Plate Detection and OCR
+# Real-Time License Plate Detection & OCR System
 
-This project performs automatic license plate detection using a YOLOv9 model and extracts text from the detected plate using Optical Character Recognition (OCR).
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![YOLOv9](https://img.shields.io/badge/YOLOv9-ultralytics-orange)
+![EasyOCR](https://img.shields.io/badge/EasyOCR-Inference-green)
+![OpenCV](https://img.shields.io/badge/OpenCV-Computer%20Vision-red)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
 
-## Features
-- Uses YOLOv9 for license plate detection.
-- Crops the detected license plate with the highest confidence.
-- Applies OCR to extract text from the cropped plate image.
-- Automatically extracts the YOLO model (`best.pt`) if not found.
+A production-ready pipeline that detects vehicle license plates in real-time using a YOLOv9 object detection model and extracts plate numbers using EasyOCR.
 
-## Installation
+## The "Why" (Real-World Value)
+Automated License Plate Recognition (ALPR) is a core component in modern smart cities, parking management, and security systems. This project automates the detection and extraction of license plate numbers from video streams or static images, reducing manual entry overhead, improving traffic log accuracy, and enabling automated access control at entry gates.
+
+## Tech Stack
+* **Object Detection:** YOLOv9 (via Ultralytics)
+* **Optical Character Recognition (OCR):** EasyOCR (PyTorch-based)
+* **Image Processing & Capture:** OpenCV
+* **Containerization:** Docker
+* **Core Language:** Python 3.10
+
+## System Workflow & Architecture
+```
+[ Video Stream / Camera ] ──> [ Frame Capture (OpenCV) ] 
+                                     │
+                                     ▼
+                      [ License Plate Detection (YOLOv9) ]
+                                     │
+                                     ▼
+                       [ High-Confidence Bounding Box ]
+                                     │
+                                     ▼
+                        [ Image Cropping & Filtering ]
+                                     │
+                                     ▼
+                         [ OCR Extraction (EasyOCR) ]
+                                     │
+                                     ▼
+                    [ Clean Text Output & Saved Image ]
+```
+
+## Quickstart Guide
 
 ### Prerequisites
-Make sure you have the following installed:
-- Python 3.8+
-- pip
-- virtualenv (optional but recommended)
+* Python 3.10+
+* Camera input (if running real-time webcam capture)
+* Docker (optional, for containerized run)
 
-### Setup
+### 1. Local Setup
+Clone the repository and install the dependencies:
 ```bash
-# Clone the repository
-git clone <repo_url>
-cd <repo_name>
+git clone https://github.com/naimul214/Real-Time-Licence-Plate-Detection-System.git
+cd Real-Time-Licence-Plate-Detection-System
 
-# Create a virtual environment (optional but recommended)
+# Create and activate virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
+# Install required dependencies
 pip install -r requirements.txt
 ```
 
-## Usage
+### 2. Run Inference
+The system automatically extracts the trained model weights (`best.pt`) from the included `best.zip` archive on first run.
 
-### 1. Running the Detection and OCR
-```python
-from yolo_ocr import yolo_predict
+* **Run on a static test image:**
+  ```bash
+  python src/detector.py --image data/raw/test.png
+  ```
 
-model_path = "best.pt"
-image_path = "path/to/image.jpg"
+* **Run real-time webcam capture loop:**
+  ```bash
+  python src/capture.py --camera 0
+  ```
 
-license_plate_text = yolo_predict(model_path, image_path)
-print("Detected License Plate:", license_plate_text)
-```
-
-### 2. Directory Structure
-```
-project_root/
-│── cropped_plates/   # Stores cropped license plate images
-│── best.pt           # YOLOv9 trained model (automatically extracted if missing)
-│── best.zip          # Zip file containing best.pt
-│── yolo_ocr.py       # Main script for YOLO detection and OCR
-│── ocr.py            # OCR script
-│── requirements.txt  # Required dependencies
-│── README.md         # Project documentation
-```
-
-## Model Check and Extraction
-If the `best.pt` model file is missing, the script will automatically attempt to extract it from `best.zip`. If neither is found, the script will prompt you to provide the model file.
-
-## Dependencies
-- `numpy`
-- `opencv-python`
-- `ultralytics` (for YOLOv9)
-- `pytesseract` (for OCR, ensure Tesseract-OCR is installed)
-
-Install dependencies with:
+### 3. Run with Docker (Containerized)
+To build and run the application in a container:
 ```bash
-pip install -r requirements.txt
+docker build -t license-plate-detector .
+docker run --device=/dev/video0 license-plate-detector
 ```
 
-## Notes
-- Ensure that `best.pt` is present in the root directory or inside `best.zip`.
-- The script will save cropped license plate images inside `cropped_plates/`.
-- You may need to configure `pytesseract` by specifying the path to `tesseract.exe` if using Windows.
+## Results & Performance
+* **Detection Confidence:** The fine-tuned YOLOv9 model detects license plates under varying lighting conditions with high confidence.
+* **Inference Speed:** Average processing speed of ~XX ms per frame on [Insert Hardware, e.g., NVIDIA Jetson Nano / Apple M1 / CPU].
+* **OCR Accuracy:** EasyOCR achieves high accuracy on clean crops, with built-in regex-based filtering to strip out regional plate noise (e.g., "Ontario").
 
-## License
-MIT License
+*(Placeholder: Insert a demo GIF or screenshot showing the bounding box overlay and OCR output text)*
 
+## Limitations & Future Work
+* **Angle & Perspective Distortion:** Extremely oblique angles reduce OCR reliability; adding a spatial transformer network (STN) or perspective correction step would improve performance.
+* **Temporal Consistency:** Currently processes frames independently; introducing a multi-object tracker (e.g., ByteTrack) would prevent duplicate detections and smooth plate text across frames.
+* **Hardware Optimization:** TensorRT optimization is needed to deploy this on low-power edge hardware at maximum frame rates.
+* **Database Integration:** Future iterations will pipe extracted license numbers and timestamps directly into a PostgreSQL/SQLite database or cloud logging service.
+
+## Connect
+* **GitHub:** [naimul214](https://github.com/naimul214)
+* **LinkedIn:** [Naimul](https://linkedin.com/in/naimul214)
